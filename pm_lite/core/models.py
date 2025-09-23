@@ -42,7 +42,7 @@ class Task(models.Model):
     status_choice = [ ("TODO", "Todo"),("INPROGRESS", "InProgress"),("DONE", "Done"),]
     priority_choice = [ ("LOW", "low"),("MEDUIM", "Meduim"),("HIGH", "High"),]
     
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='project_name')
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='project_task_name')
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=10, choices=status_choice, default='TODO')
