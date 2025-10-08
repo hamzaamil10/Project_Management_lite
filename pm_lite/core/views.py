@@ -11,13 +11,14 @@ from .permissions import IsProjectOwnerOrReadOnly, IsProjectMember
 # Project view Set
 #-----------------------------------
 class ProjectViewSet(viewsets.ModelViewSet):
+    queryset = Project.objects.all()
     serializer_class = ProjectSerializer
     permission_classes = [permissions.IsAuthenticated, IsProjectOwnerOrReadOnly] 
     def get_queryset(self):
         user = self.request.user
         # projects owned by user OR where user is a member
         owned = Project.objects.filter(owner=user)
-        member = Project.objects.filter(memberships__user=user) 
+        member = Project.objects.filter(projectmember__user=user) 
         return (owned | member).distinct()
 
 
@@ -25,6 +26,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 # Task view Set
 #-----------------------------------
 class TaskViewSet(viewsets.ModelViewSet):
+    queryset = Task.objects.all()
     serializer_class = TaskSerializer
     permission_classes = [permissions.IsAuthenticated, IsProjectMember] 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]

@@ -23,8 +23,8 @@ class Project(models.Model):
 class ProjectMember(models.Model):
     role_choice = [ ("OWNER", "Owner"),("MEMBER", "Member"),]
     
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='project_name')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='project_membership')
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     role = models.CharField(max_length=10, choices=role_choice, default='MEMBER')
 
     class Meta: 
