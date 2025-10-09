@@ -23,12 +23,7 @@ class IsProjectOwnerOrReadOnly(permissions.BasePermission):
     """
 class IsProjectMember(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        project = getattr(obj, "project", obj) if hasattr(obj, "project") else obj
-        if hasattr(obj,"project"):
-            project=obj.project
-        else:
-            project=obj
-        
+        project = getattr(obj, "project", obj) 
         if project.owner == request.user:
             return True
-        return ProjectMember.objects.filter(project=project, user=request.user).exists
+        return ProjectMember.objects.filter(project=project, user=request.user).exists()

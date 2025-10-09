@@ -15,6 +15,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'description', 'owner', 'created_at']       
 
 class TaskSerializer(serializers.ModelSerializer):
+    #project = serializers.SlugRelatedField(slug_field='name', queryset=Project.objects.all())
     class Meta: 
         model = Task
         fields = '__all__'

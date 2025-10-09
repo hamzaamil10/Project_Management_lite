@@ -4,6 +4,8 @@ from .models import Project, Task, Comment, User
 from .serializers import UserSerializer, ProjectSerializer, TaskSerializer, CommentSerializer, RegisterSerializer
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsProjectOwnerOrReadOnly, IsProjectMember
+from django.shortcuts import render
+from django.db.models import Q
 
 
 
@@ -16,10 +18,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, IsProjectOwnerOrReadOnly] 
     def get_queryset(self):
         user = self.request.user
+        return Project.objects.filter(Q(owner=user) | Q(memberships__user=user)).distinct()
         # projects owned by user OR where user is a member
-        owned = Project.objects.filter(owner=user)
-        member = Project.objects.filter(projectmember__user=user) 
-        return (owned | member).distinct()
+        #owned = Project.objects.filter(owner=user)
+        #member = Project.objects.filter(project_memberships__user=user) 
+        #return (owned | member).distinct()
 
 
 # ----------------------------------
@@ -33,7 +36,7 @@ class TaskViewSet(viewsets.ModelViewSet):
     # Which fields can be filtered
     filterset_fields = ['status', 'priority', 'assignee']
     # Which fields can be searched with ?search= keyword
-    search_fields = ['title', 'assignee']
+    search_fields = ['title', 'assignee__username', 'assignee__email']
     # Which fields can be used for ordering
     ordering_fields = ['created_at', 'status', 'priority']
     # default ordering
@@ -41,7 +44,19 @@ class TaskViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        return Task.objects.filter(project__owner=user) | Task.objects.filter(project__memberships__user=user)
+        if not user.is_authenticated:
+            return Task.objects.none()
+        qs = Task.objects.filter(
+        Q(project__owner=user) | Q(project__memberships__user=user)).distinct()
+
+        project_param = self.request.query_params.get('project')
+        if project_param:
+            if project_param.isdigit():
+                qs = qs.filter(project_id=int(project_param))
+            else:
+                qs = qs.filter(Q(project__slug=project_param) | Q(project__name=project_param))
+
+        return qs
 
 
 
@@ -67,3 +82,11 @@ class UserViewSet(viewsets.ModelViewSet):
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = [permissions.AllowAny]
+
+
+def home(request):
+    return render(request, 'core/index.html')
+
+def project_list(request):
+    projects = Project.objects.all()
+    return render(request, 'core/projects.html', {'projects': projects})

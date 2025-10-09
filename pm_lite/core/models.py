@@ -23,7 +23,7 @@ class Project(models.Model):
 class ProjectMember(models.Model):
     role_choice = [ ("OWNER", "Owner"),("MEMBER", "Member"),]
     
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="memberships")
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     role = models.CharField(max_length=10, choices=role_choice, default='MEMBER')
 
@@ -42,7 +42,7 @@ class Task(models.Model):
     status_choice = [ ("TODO", "Todo"),("INPROGRESS", "InProgress"),("DONE", "Done"),]
     priority_choice = [ ("LOW", "low"),("MEDUIM", "Meduim"),("HIGH", "High"),]
     
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='project_task_name')
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=10, choices=status_choice, default='TODO')
@@ -51,6 +51,7 @@ class Task(models.Model):
     assignee = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_tasks')
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_tasks')
     updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateField(auto_created=True)
 
     def __str__(self):
         return f"{self.title} ({self.status})"
