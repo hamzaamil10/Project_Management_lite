@@ -1,0 +1,29 @@
+{# templates/core/task_detail.html #}
+{% extends "core/base.html" %}
+{% block title %}{{ task.title }} | PM Lite{% endblock %}
+
+{% block content %}
+<p><a href="{% url 'project_detail' task.project.id %}">← Back to {{ task.project.name }}</a></p>
+
+<h1>🧩 {{ task.title }}</h1>
+<p>Status: <strong>{{ task.get_status_display }}</strong></p>
+<p>Priority: {{ task.get_priority_display }}</p>
+<p>Assignee: {{ task.assignee.username|default:"—" }}</p>
+<p>Created by: {{ task.created_by.username }}</p>
+{% if task.description %}
+  <div class="mt-3"><strong>Description:</strong><br>{{ task.description }}</div>
+{% endif %}
+
+<h2 class="mt-4">💬 Comments</h2>
+<ul>
+  {% for c in comments %}
+    <li>
+      <strong>{{ c.author.username }}</strong>
+      <small class="text-muted">{{ c.created_at|date:"Y-m-d H:i" }}</small><br>
+      {{ c.content }}
+    </li>
+  {% empty %}
+    <li>No comments yet.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

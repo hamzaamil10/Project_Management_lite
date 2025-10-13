@@ -1,10 +1,10 @@
 from rest_framework import viewsets, generics, permissions, filters
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import Project, Task, Comment, User
+from .models import Project, Task, Comment, User, ProjectMember
 from .serializers import UserSerializer, ProjectSerializer, TaskSerializer, CommentSerializer, RegisterSerializer
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsProjectOwnerOrReadOnly, IsProjectMember
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
 
 
@@ -90,3 +90,39 @@ def home(request):
 def project_list(request):
     projects = Project.objects.all()
     return render(request, 'core/projects.html', {'projects': projects})
+
+def project_detail(request, pk):
+    project = get_object_or_404(Project.objects.select_related('owner'), pk=pk)
+
+    # Optional access control (you can remove this block if not needed)
+    is_member = request.user.is_authenticated and (
+        project.owner_id == request.user.id or
+        ProjectMember.objects.filter(project=project, user=request.user).exists()
+    )
+    if not is_member:
+        return render(request, "core/not_allowed.html", status=403)
+
+    tasks = (
+        Task.objects.filter(project=project)
+        .select_related('assignee', 'created_by')
+        .order_by('-updated_at')
+    )
+    return render(request, "core/project_detail.html", {"project": project, "tasks": tasks})
+
+
+def task_detail(request, pk):
+    task = get_object_or_404(
+        Task.objects.select_related('project', 'assignee', 'created_by'),
+        pk=pk
+    )
+
+    # Optional access control
+    is_member = request.user.is_authenticated and (
+        task.project.owner_id == request.user.id or
+        ProjectMember.objects.filter(project=task.project, user=request.user).exists()
+    )
+    if not is_member:
+        return render(request, "core/not_allowed.html", status=403)
+
+    comments = Comment.objects.filter(task=task).select_related('author').order_by('-created_at')
+    return render(request, "core/task_detail.html", {"task": task, "comments": comments})

@@ -3,12 +3,15 @@
 {% block title %}Projects | PM Lite{% endblock %}
 
 {% block content %}
-    <h1>📂 Project List</h1>
-    <ul>
-        {% for project in projects %}
-            <li>{{ project.name }} — Owned by {{ project.owner.username }}</li>
-        {% empty %}
-            <li>No projects available.</li>
-        {% endfor %}
-    </ul>
+<h1>📂 Project List</h1>
+<ul>
+  {% for project in projects %}
+    <li>
+      <a href="{% url 'project_detail' project.id %}">{{ project.name }}</a>
+      — Owned by {{ project.owner.username }}
+    </li>
+  {% empty %}
+    <li>No projects available.</li>
+  {% endfor %}
+</ul>
 {% endblock %}
