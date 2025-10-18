@@ -10,8 +10,8 @@
       <div class="card-body">
         <h1 class="h4">{{ task.title }}</h1>
         <div class="mb-2">
-          <span class="badge text-bg-primary">{{ task.get_priority_display }}</span>
-          <span class="badge {% if task.status == 'DONE' %}text-bg-success{% elif task.status == 'INPROGRESS' %}text-bg-warning{% else %}text-bg-secondary{% endif %}">
+          <strong>Priority:</strong> <span class="badge text-bg-primary">{{ task.get_priority_display }}</span>
+          <strong>Status:</strong> <span class="badge {% if task.status == 'DONE' %}text-bg-success{% elif task.status == 'INPROGRESS' %}text-bg-warning{% else %}text-bg-secondary{% endif %}">
             {{ task.get_status_display }}
           </span>
         </div>
@@ -37,7 +37,7 @@
               <strong>{{ c.author.username }}</strong>
               <small class="text-muted">{{ c.created_at|date:"Y-m-d H:i" }}</small>
             </div>
-            <div>{{ c.content }}</div>
+            <div>{{ c.text }}</div>
           </li>
         {% empty %}
           <li class="list-group-item text-muted">No comments yet.</li>
