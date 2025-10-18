@@ -1,0 +1,46 @@
+{% extends "core/base.html" %}
+{% block title %}{{ project.name }} · PM Lite{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <h1 class="h3 mb-1">📁 {{ project.name }}</h1>
+  <p class="text-muted mb-0">Owner: {{ project.owner.username }}</p>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-header d-flex flex-wrap gap-2 align-items-center">
+    <strong>Tasks</strong>
+    <div class="ms-auto d-flex gap-2">
+      <select id="statusFilter" class="form-select form-select-sm" style="width: 180px;">
+        <option value="">All statuses</option>
+        <option value="TODO">Todo</option>
+        <option value="INPROGRESS">In Progress</option>
+        <option value="DONE">Done</option>
+      </select>
+      <input id="taskSearch" type="search" class="form-control form-control-sm" placeholder="Search tasks...">
+    </div>
+  </div>
+  <ul id="taskList" class="list-group list-group-flush">
+    {% for t in tasks %}
+      <li class="list-group-item d-flex justify-content-between align-items-start task-item"
+          data-status="{{ t.status|default_if_none:'' }}"
+          data-title="{{ t.title|lower }}">
+        <div>
+          <a class="fw-semibold" href="{% url 'task_detail' t.id %}">{{ t.title }}</a>
+          <div class="small text-muted">
+            Assignee: {{ t.assignee.username|default:"—" }} · Priority: {{ t.get_priority_display }}
+          </div>
+        </div>
+        <span class="badge rounded-pill
+          {% if t.status == 'DONE' %}text-bg-success
+          {% elif t.status == 'INPROGRESS' %}text-bg-warning
+          {% else %}text-bg-secondary{% endif %}">
+          {{ t.get_status_display }}
+        </span>
+      </li>
+    {% empty %}
+      <li class="list-group-item text-muted">No tasks for this project yet.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

@@ -1,9 +1,7 @@
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-}
-
-.container {
-    padding: 20px;
-}
+/* Small polish on typography and spacing */
+body { font-size: 16px; }
+.navbar .navbar-brand { letter-spacing: .2px; }
+.card { border-radius: 14px; }
+.list-group-item { padding: .9rem 1rem; }
+.badge { font-weight: 600; }
+h1, .h1, .h3 { letter-spacing: .2px; }

@@ -1,29 +1,49 @@
-{# templates/core/task_detail.html #}
 {% extends "core/base.html" %}
-{% block title %}{{ task.title }} | PM Lite{% endblock %}
+{% block title %}{{ task.title }} · PM Lite{% endblock %}
 
 {% block content %}
-<p><a href="{% url 'project_detail' task.project.id %}">← Back to {{ task.project.name }}</a></p>
+<a class="btn btn-sm btn-outline-secondary mb-3" href="{% url 'project_detail' task.project.id %}">← Back to {{ task.project.name }}</a>
 
-<h1>🧩 {{ task.title }}</h1>
-<p><strong>Status:</strong> {{ task.get_status_display }}</p>
-<p><strong>Priority:</strong> {{ task.get_priority_display }}</p>
-<p><strong>Assignee:</strong> {{ task.assignee.username|default:"—" }}</p>
-<p><strong>Created by:</strong> {{ task.created_by.username }}</p>
-{% if task.description %}
-  <div class="mt-3"><strong>Description:</strong><br>{{ task.description }}</div>
-{% endif %}
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h1 class="h4">{{ task.title }}</h1>
+        <div class="mb-2">
+          <span class="badge text-bg-primary">{{ task.get_priority_display }}</span>
+          <span class="badge {% if task.status == 'DONE' %}text-bg-success{% elif task.status == 'INPROGRESS' %}text-bg-warning{% else %}text-bg-secondary{% endif %}">
+            {{ task.get_status_display }}
+          </span>
+        </div>
+        <p class="text-muted small mb-2">
+          Assignee: {{ task.assignee.username|default:"—" }} · Created by: {{ task.created_by.username }}
+        </p>
+        {% if task.description %}
+          <p class="mb-0">{{ task.description }}</p>
+        {% else %}
+          <p class="text-muted">No description.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
 
-<h2 class="mt-4">💬 Comments</h2>
-<ul>
-  {% for c in comments %}
-    <li>
-      <strong>{{ c.author.username }}</strong>
-      <small class="text-muted">{{ c.created_at|date:"Y-m-d H:i" }}</small><br>
-      {{ c.text }}
-    </li>
-  {% empty %}
-    <li>No comments yet.</li>
-  {% endfor %}
-</ul>
+  <div class="col-lg-5">
+    <div class="card shadow-sm">
+      <div class="card-header"><strong>Comments</strong></div>
+      <ul class="list-group list-group-flush">
+        {% for c in comments %}
+          <li class="list-group-item">
+            <div class="d-flex justify-content-between">
+              <strong>{{ c.author.username }}</strong>
+              <small class="text-muted">{{ c.created_at|date:"Y-m-d H:i" }}</small>
+            </div>
+            <div>{{ c.content }}</div>
+          </li>
+        {% empty %}
+          <li class="list-group-item text-muted">No comments yet.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
 {% endblock %}

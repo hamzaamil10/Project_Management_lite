@@ -1,17 +1,20 @@
 {% extends "core/base.html" %}
-
-{% block title %}Projects | PM Lite{% endblock %}
+{% block title %}Projects · PM Lite{% endblock %}
 
 {% block content %}
-<h1>📂 Project List</h1>
-<ul>
+<div class="d-flex align-items-center mb-3">
+  <h1 class="h3 mb-0">📂 Project List</h1>
+</div>
+
+<div class="list-group shadow-sm">
   {% for project in projects %}
-    <li>
-      <a href="{% url 'project_detail' project.id %}">{{ project.name }}</a>
-      — Owned by {{ project.owner.username }}
-    </li>
+    <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+       href="{% url 'project_detail' project.id %}">
+      <span class="fw-semibold">{{ project.name }}</span>
+      <span class="badge text-bg-secondary">Owner: {{ project.owner.username }}</span>
+    </a>
   {% empty %}
-    <li>No projects available.</li>
+    <div class="list-group-item text-muted">No projects available.</div>
   {% endfor %}
-</ul>
+</div>
 {% endblock %}
